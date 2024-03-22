@@ -1,26 +1,57 @@
-import Profile from './components/Profile/Profile';
-import FriendList from './components/FriendList/FriendList';
-import TransactionHistory from './components/TransactionHistory/TransactionHistory';
+import ContactForm from './components/ContactForm/ContactForm';
+import SearchBox from './components/SearchBox/SearchBox';
+import ContactList from './components/ContactList/ContactList';
+import { useEffect, useState } from 'react';
+import { nanoid } from 'nanoid';
 
-import userData from './userData.json';
-import friends from './friends.json';
-import transactions from './transactions.json';
+import initialValues from './contacts.json';
 
 const App = () => {
+  const [filter, setFilter] = useState('');
+  const [contacts, setContact] = useState(() => {
+    const savedContacts = window.localStorage.getItem('contacts');
+
+    if (savedContacts !== null) {
+      return JSON.parse(savedContacts);
+    }
+
+    return initialValues;
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const onAddContact = contactData => {
+    const finalContact = {
+      id: nanoid(),
+      ...contactData,
+    };
+
+    setContact(prevContacts => [...prevContacts, finalContact]);
+  };
+
+  const deleteContact = contactId => {
+    console.log(contactId);
+    setContact(prevContacts => {
+      console.log(prevContacts);
+      return prevContacts.filter(contact => contact.id !== contactId);
+    });
+  };
+
+  const filteredContacts = contacts.filter(
+    contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase()) ||
+      contact.number.includes(filter)
+  );
+
   return (
-    <>
-      <Profile
-        name={userData.username}
-        tag={userData.tag}
-        location={userData.location}
-        image={userData.avatar}
-        stats={userData.stats}
-      />
-
-      <FriendList friends={friends} />
-
-      <TransactionHistory transactions={transactions} />
-    </>
+    <div>
+      <h1>Phone book</h1>
+      <ContactForm onAddContact={onAddContact} />
+      <SearchBox value={filter} onFilter={setFilter} />
+      <ContactList contacts={filteredContacts} onDelete={deleteContact} />
+    </div>
   );
 };
 
