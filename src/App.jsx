@@ -4,6 +4,8 @@ import ContactList from './components/ContactList/ContactList';
 import { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 
+import css from './App.module.css';
+
 import initialValues from './contacts.json';
 
 const App = () => {
@@ -39,15 +41,13 @@ const App = () => {
     });
   };
 
-  const filteredContacts = contacts.filter(
-    contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase()) ||
-      contact.number.includes(filter)
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
-    <div>
-      <h1>Phone book</h1>
+    <div className={css.wrapper}>
+      <h1 className={css.title}>Phone book</h1>
       <ContactForm onAddContact={onAddContact} />
       <SearchBox value={filter} onFilter={setFilter} />
       <ContactList contacts={filteredContacts} onDelete={deleteContact} />
